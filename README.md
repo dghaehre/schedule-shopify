@@ -3,9 +3,9 @@
 
 > This is a simple package based on shopify-api-node to schedule product price updates in shopify
 
-> Easily create a cron job to run as frequent you would like and it will check the json file and run necessary updates.
+> Easily create a cron job to run as frequent you would like and it will check the json file and run necessary updates. If cron finds job that is scheduled to run within 3 minutes it will run the update. It will of course run any update that was supposed to be ran already. So the accuracy of the cron is determined by when you schedule and how often cron.js is ran.
 
-> NOTE: This package will create a jsonfile with you shopify credentials for cron job, if you dont feel comfortable with that you can use something else.
+> NOTE: This package will create a jsonfile with your shopify credentials for cron job, if you feel like that is not good enough please feel free to help, as I have not bothered yet.
 
 
 ## Install
@@ -28,8 +28,8 @@ const Schedule = ScheduleShopify({
 
 
 let productSchedule = await Schedule.add({
-  product: Sku || Barcode || Shopify-Id,
-  time: `Time format`,
+  product: Shopify-Id,
+  time: `2017-10-16T12:28:08`, // Anything that will work with new Date(time.getTime())
   price: price,
   priceCompare: priceCompare
 })

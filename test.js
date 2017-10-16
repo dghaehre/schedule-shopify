@@ -9,23 +9,21 @@ const Schedule = ScheduleShopify({
 
 
 const run = async () => {
-let test, add, list, del
+let add, list, del
 try {
-  //test = await Schedule.test()
 
-  /*add = await Schedule.add({
+  add = await Schedule.add({
     product: 'Skutest2',
-    time: `Time format`,
+    time: `Mon Oct 16 2017 15:13:28 GMT+0200 (CEST)`,
     price: 40,
     priceCompare: 40
   })
-*/
-  list = await Schedule.list({limit: 10})
+
+  //list = await Schedule.list({limit: 10})
 
   //del = await Schedule.del(1)
 
 } catch(err) {console.log(err)}
-  console.log(test)
   console.log(add)
   console.log(list)
   console.log(del)
