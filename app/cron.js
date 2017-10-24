@@ -13,9 +13,6 @@ exports.getAll = () => new Promise((resolve, reject) => {
   }
 })})
 
-
-
-
 exports.toBeUpdated = list => new Promise((resolve, reject) => {
 let now = new Date().getTime() + (3 * 60 * 1000) // + 3 minutes
 
@@ -28,16 +25,12 @@ let itstime = list.reduce((a, x) => a.concat([{
                 }
   }]), [])
 
-
 resolve(itstime)
 
 })
 
 
-
 exports.update = list => new Promise((resolve, reject) => {
-
-  console.log(JSON.stringify(list, null, 2))
 
   Promise.all(list.map(x => Update(x.config, x.schedule)))
   .then(success => resolve(success))
@@ -53,7 +46,7 @@ const Update = (config, data) => new Promise((resolve, reject) => {
 
   let updatePriceShopify = updatePrice(shopify)
 
-  Promise.all(data.map(x => updatePriceShopify(x)))
+  Promise.all(data.map((x, i) => updatePriceShopify(x, i)))
   .then(success => resolve(success))
   .catch(err => reject(err))
 
@@ -63,10 +56,6 @@ const Update = (config, data) => new Promise((resolve, reject) => {
 
 const updatePrice = shopify => (data, i=0) => new Promise((resolve, reject) => {
     setTimeout(() => {
-    /*
-    * Id = data.No[0] || testid -> Which is sku!!
-    * Aii Sku is not okey! we need id!!!
-    */
 
     shopify.productVariant.update(data.product, {
       price: data.price,
@@ -84,12 +73,7 @@ const updatePrice = shopify => (data, i=0) => new Promise((resolve, reject) => {
 })
 
 
-
-
-
 const filterTime = now => x => {
-
   let isValid = isNaN(new Date(x.time).getTime())
-
   return isValid ? false : new Date(x.time).getTime() <  now ? true : false
 }

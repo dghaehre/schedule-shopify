@@ -4,7 +4,6 @@ const fs = require('fs')
 const path = require('path')
 const file = path.resolve(__dirname, '../data.json')
 
-
 module.exports = (config, data) => new Promise((resolve, reject) => {
 
   let limit = data.limit

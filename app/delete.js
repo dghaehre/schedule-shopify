@@ -12,9 +12,7 @@ const remove = (x, id) => {
 
 module.exports = (config, data) => new Promise((resolve, reject) => {
 
-
   let id = data
-
 
   jsonfile.readFile(file, (err, oldfile) => {
     if(err) {reject({status: 'failed', err: err})} else {
