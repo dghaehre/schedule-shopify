@@ -6,7 +6,7 @@ const file = path.resolve(__dirname, '../data.json')
 
 module.exports = (config, data) => new Promise((resolve, reject) => {
 
-  let limit = data.limit
+  let limit = data.limit || 1000
 
   jsonfile.readFile(file, (err, oldfile) => {
     if(err) {reject(err)} else {

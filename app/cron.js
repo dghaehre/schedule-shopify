@@ -4,6 +4,8 @@ const fs = require('fs')
 const path = require('path')
 const file = path.resolve(__dirname, '../data.json')
 const Shopify = require('shopify-api-node') // !! Dette trenger man bare for cron!!!
+const createDate = d => new Date(d.split('/')[2].substring(0, 4), d.split('/')[0], d.split('/')[1], d.split('T')[1].split(':')[0],d.split('T')[1].split(':')[1])
+
 
 
 exports.getAll = () => new Promise((resolve, reject) => {
@@ -74,6 +76,6 @@ const updatePrice = shopify => (data, i=0) => new Promise((resolve, reject) => {
 
 
 const filterTime = now => x => {
-  let isValid = isNaN(new Date(x.time).getTime())
-  return isValid ? false : new Date(x.time).getTime() <  now ? true : false
+  let isValid = isNaN(createDate(x.time).getTime())
+  return isValid ? false : createDate(x.time).getTime() <  now ? true : false
 }

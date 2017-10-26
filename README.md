@@ -31,7 +31,7 @@ const Schedule = ScheduleShopify({
 
 let productSchedule = await Schedule.add({
   product: Shopify-Id,
-  time: `2017-10-16T12:28:08`, // Anything that will work with new Date(time.getTime())
+  time: `10/24/2017T12:28:00`,
   price: price,
   priceCompare: priceCompare
 })
@@ -40,7 +40,7 @@ let productSchedule = await Schedule.add({
 let scheduleList = await Schedule.list({limit: 10})
 //=> list of 10 schedules
 
-let removeSchedule = await Schedule.del({id: 8})
+let removeSchedule = await Schedule.del(8)
 //=> {status, err}
 
 ```
@@ -51,6 +51,6 @@ let removeSchedule = await Schedule.del({id: 8})
 
 // Example:
 
-
+node ./node_modules/schedule-shopify/cron.js
 
 ```

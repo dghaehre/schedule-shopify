@@ -14,15 +14,11 @@ module.exports = (config, data) => new Promise((resolve, reject) => {
 jsonfile.readFile(file, (err, oldfile) => {
   if(err) {reject({status: 'failed', err: err})} else {
 
-  console.log(JSON.stringify(oldfile, null, 2))
-
   let shop = oldfile.filter(x => x.shopName === config.shopName ? true : false)
 
   let s = shop[0] || {}
 
   let updateFile = shop.length > 0 ? addExisting(oldfile, s, data, config) : createNew(oldfile, s, data, config)
-
-  console.log(`update : ${JSON.stringify(updateFile, null, 2)}`)
 
   jsonfile.writeFile(file, updateFile, (err) => {
 
