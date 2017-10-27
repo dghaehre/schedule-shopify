@@ -5,8 +5,7 @@ const path = require('path')
 const file = path.resolve(__dirname, '../data.json')
 const Shopify = require('shopify-api-node')
 const createDate = d => new Date(d.split('/')[2].substring(0, 4), d.split('/')[0], d.split('/')[1], d.split('T')[1].split(':')[0],d.split('T')[1].split(':')[1])
-const remove = status => data => status.reduce((bool, stat) => stat.split(':')[0] === 'success' && stat.split(':')[1] == data.product ? false : bool, true)
-
+const remove = status => (data, i) => status.reduce((bool, stat) => stat.split(':')[0] === 'success' && stat.split(':')[1] == data.product && stat.split(':')[2] === i ? false : bool, true)
 
 
 exports.getAll = () => new Promise((resolve, reject) => {
@@ -27,9 +26,7 @@ let itstime = list.reduce((a, x) => a.concat([{
                   password: x.password
                 }
   }]), [])
-
 resolve(itstime)
-
 })
 
 
@@ -68,6 +65,23 @@ let shopify, updatePriceShopify, status, removed
 */
 })
 
+const updatePrice = shopify => (data, i=0) => new Promise((resolve, reject) => {
+    setTimeout(() => {
+
+    shopify.productVariant.update(data.product, {
+      price: data.price,
+      compare_price: data.compare_price
+    })
+    .then(order => {
+      resolve(`success:${data.product}:${i}`)
+    })
+    .catch(err => {
+      console.log(err)
+      console.log(`data: ${JSON.stringify(data, null, 2)}`)
+      resolve(`failed id:${data.product}:${i}`)
+    })
+  }, i*1500)
+})
 
 
 const removeSuccesfulUpdates = (status, config, schedule) => new Promise((resolve, reject) => {
@@ -96,24 +110,6 @@ try {
     newfile = oldfile.map(x => x.schedule.filter(remove(list)))
 } catch(err) {console.log(err); reject(err)}
 
-})
-
-const updatePrice = shopify => (data, i=0) => new Promise((resolve, reject) => {
-    setTimeout(() => {
-
-    shopify.productVariant.update(data.product, {
-      price: data.price,
-      compare_price: data.compare_price
-    })
-    .then(order => {
-      resolve(`success:${data.product}`)
-    })
-    .catch(err => {
-      console.log(err)
-      console.log(`data: ${JSON.stringify(data, null, 2)}`)
-      resolve(`failed id:${data.product}`)
-    })
-  }, i*1500)
 })
 
 
