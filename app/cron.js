@@ -3,8 +3,9 @@ const jsonfile = require('jsonfile')
 const fs = require('fs')
 const path = require('path')
 const file = path.resolve(__dirname, '../data.json')
-const Shopify = require('shopify-api-node') // !! Dette trenger man bare for cron!!!
+const Shopify = require('shopify-api-node')
 const createDate = d => new Date(d.split('/')[2].substring(0, 4), d.split('/')[0], d.split('/')[1], d.split('T')[1].split(':')[0],d.split('T')[1].split(':')[1])
+const remove = status => data => status.reduce((bool, stat) => stat.split(':')[0] === 'success' && stat.split(':')[1] == data.product ? true : bool, false
 
 
 
@@ -40,21 +41,57 @@ exports.update = list => new Promise((resolve, reject) => {
 
 })
 
+const Update = (config, data) => new Promise(async (resolve, reject) => {
+let shopify, updatePriceShopify, status, removed
+  try {
+      shopify = new Shopify(config)
 
+      updatePriceShopify = updatePrice(shopify)
 
-const Update = (config, data) => new Promise((resolve, reject) => {
+      status = await Promise.all(data.map((x, i) => updatePriceShopify(x, i)))
 
+      removed = await removeSuccesfulUpdates(status, config, data)
+
+  } catch(err) {reject(err)}
+
+    resolve(removed)
+
+  /*
   let shopify = new Shopify(config)
 
   let updatePriceShopify = updatePrice(shopify)
 
   Promise.all(data.map((x, i) => updatePriceShopify(x, i)))
+  .then(success => removeSuccesfulUpdates(success, config, data)))
   .then(success => resolve(success))
   .catch(err => reject(err))
-
+*/
 })
 
 
+
+const removeSuccesfulUpdates = (status, config, schedule) => new Promise((resolve, reject) => {
+
+  jsonfile.readFile(file, (err, oldfile) => {
+    if(err) {reject({status: 'failed', err: err})} else {
+      console.log(`oldfile: ${JSON.stringify(oldfile, null, 2)}`)
+      let updateFile = oldfile.map(x => x.shopName === config.shopName ? schedule.filter(remove(status)) : x)
+      console.log(`new file: ${JSON.stringify(updateFile, null, 2)}`)
+      jsonfile.writeFile(file, updateFile, (err) => {
+        err ? reject({status: 'failed', err: err}) : resolve('success')
+      })
+    }})
+
+}) //// Må fikse dette!!
+
+const removeSuccess = list => new Promise(async (resolve, reject) => {
+let status, oldfile, newfile
+try {
+    oldfile = await getAll()
+    newfile = oldfile.map(x => x.schedule.filter(remove(list)))
+} catch(err) {console.log(err); reject(err)}
+
+})
 
 const updatePrice = shopify => (data, i=0) => new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -64,12 +101,12 @@ const updatePrice = shopify => (data, i=0) => new Promise((resolve, reject) => {
       compare_price: data.compare_price
     })
     .then(order => {
-      resolve(`success : ${data.product}`)
+      resolve(`success:${data.product}`)
     })
     .catch(err => {
       console.log(err)
       console.log(`data: ${JSON.stringify(data, null, 2)}`)
-      resolve(`failed id: ${data.product}`)
+      resolve(`failed id:${data.product}`)
     })
   }, i*1500)
 })
