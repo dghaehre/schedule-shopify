@@ -5,8 +5,7 @@ const path = require('path')
 const file = path.resolve(__dirname, '../data.json')
 const Shopify = require('shopify-api-node')
 const createDate = d => new Date(d.split('/')[2].substring(0, 4), d.split('/')[0], d.split('/')[1], d.split('T')[1].split(':')[0],d.split('T')[1].split(':')[1])
-const remove = status => data => status.reduce((bool, stat) => stat.split(':')[0] === 'success' && stat.split(':')[1] == data.product && stat.split(':')[2] === data.time ? false : bool, true)
-
+const remove = status => data => status.reduce((bool, stat) => stat.status === 'success' && stat.id == data.product && stat.time === data.time ? false : bool, true)
 
 exports.getAll = () => new Promise((resolve, reject) => {
   jsonfile.readFile(file, (err, oldfile) => {
@@ -66,12 +65,19 @@ const updatePrice = shopify => (data, i=0) => new Promise((resolve, reject) => {
       compare_price: data.compare_price
     })
     .then(order => {
-      resolve(`success:${data.product}:${data.time}`)
+      resolve({
+          status: 'success',
+          id: data.product,
+          time: data.time
+        })
     })
     .catch(err => {
       console.log(err)
-      console.log(`data: ${JSON.stringify(data, null, 2)}`)
-      resolve(`failed id:${data.product}:${i}`)
+      resolve({
+          status: 'failed',
+          id: data.product,
+          time: data.time
+        })
     })
   }, i*1500)
 })
@@ -80,14 +86,12 @@ const updatePrice = shopify => (data, i=0) => new Promise((resolve, reject) => {
 const removeSuccesfulUpdates = (status, config, schedule) => new Promise((resolve, reject) => {
   jsonfile.readFile(file, (err, oldfile) => {
     if(err) {reject({status: 'failed', err: err})} else {
-      console.log(`oldfile: ${JSON.stringify(oldfile, null, 2)}`)
       let updateFile = oldfile.map(x => {
         if(x.shopName === config.shopName) {
-          x.schedule = schedule.filter(remove(status))
+          x.schedule = x.schedule.filter(remove(status))
         }
         return x
       })
-      console.log(`new file: ${JSON.stringify(updateFile, null, 2)}`)
       jsonfile.writeFile(file, updateFile, (err) => {
         err ? reject({status: 'failed', err: err}) : resolve('success')
       })
