@@ -5,7 +5,7 @@ const path = require('path')
 const file = path.resolve(__dirname, '../data.json')
 const Shopify = require('shopify-api-node')
 const createDate = d => new Date(d.split('/')[2].substring(0, 4), d.split('/')[0], d.split('/')[1], d.split('T')[1].split(':')[0],d.split('T')[1].split(':')[1])
-const remove = status => data => status.reduce((bool, stat) => stat.split(':')[0] === 'success' && stat.split(':')[1] == data.product ? true : bool, false)
+const remove = status => data => status.reduce((bool, stat) => stat.split(':')[0] === 'success' && stat.split(':')[1] == data.product ? false : bool, true)
 
 
 
@@ -75,7 +75,12 @@ const removeSuccesfulUpdates = (status, config, schedule) => new Promise((resolv
   jsonfile.readFile(file, (err, oldfile) => {
     if(err) {reject({status: 'failed', err: err})} else {
       console.log(`oldfile: ${JSON.stringify(oldfile, null, 2)}`)
-      let updateFile = oldfile.map(x => x.shopName === config.shopName ? schedule.filter(remove(status)) : x)
+      let updateFile = oldfile.map(x => {
+        if(x.shopName === config.shopName) {
+          x.schedule = schedule.filter(remove(status))
+        }
+        return x
+      })
       console.log(`new file: ${JSON.stringify(updateFile, null, 2)}`)
       jsonfile.writeFile(file, updateFile, (err) => {
         err ? reject({status: 'failed', err: err}) : resolve('success')
