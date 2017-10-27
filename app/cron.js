@@ -5,7 +5,7 @@ const path = require('path')
 const file = path.resolve(__dirname, '../data.json')
 const Shopify = require('shopify-api-node')
 const createDate = d => new Date(d.split('/')[2].substring(0, 4), d.split('/')[0], d.split('/')[1], d.split('T')[1].split(':')[0],d.split('T')[1].split(':')[1])
-const remove = status => data => status.reduce((bool, stat) => stat.split(':')[0] === 'success' && stat.split(':')[1] == data.product ? true : bool, false
+const remove = status => data => status.reduce((bool, stat) => stat.split(':')[0] === 'success' && stat.split(':')[1] == data.product ? true : bool, false)
 
 
 
