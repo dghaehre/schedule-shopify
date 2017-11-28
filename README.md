@@ -1,8 +1,6 @@
 
 # schedule-shopify
 
-> NOTE: This is not ready yet!
-
 > This is a simple package based on shopify-api-node to schedule product price updates in shopify
 
 > Easily create a cron job to run as frequent you would like and it will check the json file and run necessary updates. If cron finds job that is scheduled to run within 3 minutes it will run the update. It will of course run any update that was supposed to be ran already. So the accuracy of the cron is determined by when you schedule and how often cron.js is ran.
@@ -47,10 +45,11 @@ let removeSchedule = await Schedule.del(8)
 
 ## CRON
 
-```js
 
-// Example:
-
-node ./node_modules/schedule-shopify/cron.js
+Example
 
 ```
+$ node ./node_modules/schedule-shopify/cron.js
+```
+
+Cron will update any price where current time is after schedules time + 3 minutes
